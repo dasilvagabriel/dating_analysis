@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Feb 24 23:10:19 2023
-
-@author: gabri
-"""
-
 import pandas as pd
 import numpy as np
 from app_store_scraper import AppStore
