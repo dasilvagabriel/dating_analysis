@@ -12,10 +12,38 @@ The following libraries and packages are required for this code to run properly:
 * beautifulsoup4
 * pandas
 * numpy
+* plotly Express
+* nltk
+* wordcloud
+* matplotlib.pyplot
 
 These can be installed using pip.
 
 ## Classes
+### ProductReviews
+A class to represent a set of product reviews.
+
+Attributes
+* `df: pandas.DataFrame`:The dataframe containing the product reviews.
+
+Methods
+* `create_histogram(title)`: creates a histogram of the product ratings and displays it.
+
+### WordCloudGenerator 
+A class designed to generate a word cloud from a CSV file. It has the following methods:
+
+* `init(self, file_path: str, new_stopwords: list)` : this method initializes a new instance of the WordCloudGenerator class.
+* `generate_word_cloud(self)`: This method generates a word cloud from the CSV file.
+
+Arguments:
+* ` file_path (str)`: the path of the CSV file to generate a word cloud from.
+* `new_stopwords (list)`: a list of new stopwords to add to the existing list of stopwords.
+
+Attributes
+* `df`: This attribute contains the pandas dataframe object that is created by reading the CSV file.
+* `comment_words`: This attribute is an empty string that will be populated with the text from the CSV file.
+* `stopwords`: This attribute is a list of English stopwords obtained from the nltk library. It is extended with the additional stopwords passed to the class during initialization.
+
 ### SentimentAnalyzer
 This class takes a pre-trained BERT-based model and uses it to calculate the sentiment score of a given review text. The `SentimentAnalyzer` class has the following attributes:
 
