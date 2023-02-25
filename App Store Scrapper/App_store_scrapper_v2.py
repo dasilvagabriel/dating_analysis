@@ -1,3 +1,5 @@
+#pip install app-store-scraper
+
 import pandas as pd
 import numpy as np
 from app_store_scraper import AppStore
@@ -74,3 +76,21 @@ hornet_scraper = AppReviewsScraper(country='us', app_name='hornet', app_id='4626
 
 # scrape the reviews and export them to a CSV file
 hornet_scraper.export_to_csv('hornet_reviews.csv')
+
+# instantiate the class for tinder app reviews
+tinder_scraper = AppReviewsScraper(country='us', app_name='tinder', app_id='547702041', how_many=2000)
+
+# scrape the reviews and export them to a CSV file
+tinder_scraper.export_to_csv('tinder_reviews.csv')
+
+# instantiate the class for badoo app reviews
+badoo_scraper = AppReviewsScraper(country='us', app_name='badoo', app_id='351331194', how_many=2000)
+
+# scrape the reviews and export them to a CSV file
+badoo_scraper.export_to_csv('badoo_reviews.csv')
+
+# instantiate the class for Bumble app reviews
+bumble_scraper = AppReviewsScraper(country='us', app_name='bumble', app_id='930441707', how_many=2000)
+
+# scrape the reviews and export them to a CSV file
+bumble_scraper.export_to_csv('bumble_reviews.csv')
