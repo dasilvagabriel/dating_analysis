@@ -1,13 +1,14 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[1]:
+# In[39]:
 
 
 #install and import the relevant libraries and packages
 get_ipython().system('conda install pytorch torchvision torchaudio -c pytorch -y')
 get_ipython().system('pip install transformers requests beautifulsoup4 pandas numpy')
 get_ipython().system('pip install torchvision ')
+get_ipython().system('conda install -c peterjc123 pytorch cuda80')
 
 import pandas as pd
 import torch
@@ -24,7 +25,7 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 
 
-# In[10]:
+# In[2]:
 
 
 class ProductReviews:
@@ -157,7 +158,7 @@ stats_df = pd.DataFrame(stats_dict)
 display(stats_df)
 
 
-# In[25]:
+# In[38]:
 
 
 class WordCloudGenerator:
@@ -229,7 +230,7 @@ plt.savefig('wordcloud.png', dpi=300)
 plt.show()
 
 
-# In[15]:
+# In[ ]:
 
 
 class SentimentAnalyzer:
@@ -395,7 +396,7 @@ bumble_reviews['sentiment'] = bumble_reviews['review'].apply(lambda x: analyzer.
 bumble_reviews.to_csv('sentiment_bumble.csv', index=False)
 
 
-# In[16]:
+# In[ ]:
 
 
 # Define a list of products
@@ -420,4 +421,227 @@ for product in products:
 
 # Print the table of statistics
 display(stats_df)
+
+
+# In[71]:
+
+
+import pandas as pd
+
+class CSVFileMerger:
+    """
+    A class to merge multiple CSV files into a single CSV file.
+
+    Attributes:
+    -----------
+    input_files : list
+        A list of file paths to the CSV files that need to be merged.
+    output_file : str
+        The file path where the merged CSV file will be saved.
+
+    Methods:
+    --------
+    merge_csv_files()
+        Merges the input CSV files and saves the result in the specified output file.
+    """
+
+    def __init__(self, input_files, output_file):
+        self.input_files = input_files
+        self.output_file = output_file
+
+    def merge_csv_files(self):
+        """Merges the input CSV files and saves the result in the specified output file."""
+        merged_data = pd.DataFrame()
+
+        # Iterate through the input files and read each CSV file
+        for file in self.input_files:
+            data = pd.read_csv(file)
+            # Concatenate the current data with the merged_data DataFrame
+            merged_data = pd.concat([merged_data, data], ignore_index=True)
+
+        # Save the merged data to the output file
+        merged_data.to_csv(self.output_file, index=False)
+
+# Define file paths for the CSV files
+gay_dating_apps = ['grindr_reviews.csv', 'scruff_reviews.csv', 'hornet_reviews.csv']
+general_dating_apps = ['tinder_reviews.csv', 'badoo_reviews.csv', 'bumble_reviews.csv']
+gay_dating_apps_sentiment = ['sentiment_grindr.csv', 'sentiment_scruff.csv', 'sentiment_hornet.csv']
+general_dating_apps_sentiment = ['sentiment_tinder.csv', 'sentiment_badoo.csv', 'sentiment_bumble.csv']
+
+# Create instances of the CSVFileMerger class for each file set
+gay_apps_merger = CSVFileMerger(gay_dating_apps, 'gay_dating_apps_merged.csv')
+general_apps_merger = CSVFileMerger(general_dating_apps, 'general_dating_apps_merged.csv')
+gay_apps_sentiment_merger = CSVFileMerger(gay_dating_apps_sentiment, 'gay_dating_apps_sentiment_merged.csv')
+general_apps_sentiment_merger = CSVFileMerger(general_dating_apps_sentiment, 'general_dating_apps_sentiment_merged.csv')
+
+# Merge the CSV files
+gay_apps_merger.merge_csv_files()
+general_apps_merger.merge_csv_files()
+gay_apps_sentiment_merger.merge_csv_files()
+general_apps_sentiment_merger.merge_csv_files()
+
+
+# In[89]:
+
+
+def calculate_descriptive_statistics(df, column_name):
+    """
+    This script calculates the descriptive statistics for rating data from merged CSV files of gay dating apps,
+    general dating apps, gay dating apps sentiment, and general dating apps sentiment.
+
+    Functions:
+        calculate_descriptive_statistics(df): Calculates the mean, mode, median, standard deviation,
+                                              and variance for the rating column in the given DataFrame.
+
+    The script reads merged CSV files, calculates descriptive statistics for each dataset, and then
+    prints the results.
+    """
+    mean = round(df[column_name].mean(), 2)
+    mode = df[column_name].mode().values[0]
+    median = round(df[column_name].median(), 2)
+    std_dev = round(df[column_name].std(), 2)
+    variance = round(df[column_name].var(), 2)
+
+    return {
+        'Mean': mean,
+        'Mode': mode,
+        'Median': median,
+        'Standard Deviation': std_dev,
+        'Variance': variance
+    }
+
+# Calculate descriptive statistics for the the chosen column
+gay_dating_apps_stats = calculate_descriptive_statistics(gay_dating_apps_df, 'rating')
+general_dating_apps_stats = calculate_descriptive_statistics(general_dating_apps_df, 'rating')
+gay_apps_sentiment_stats = calculate_descriptive_statistics(gay_apps_sentiment_df, 'sentiment')
+general_apps_sentiment_stats = calculate_descriptive_statistics(general_apps_sentiment_df, 'sentiment')
+
+# Print the results
+print("Descriptive statistics for gay dating apps:")
+for stat, value in gay_dating_apps_stats.items():
+    print(f"{stat}: {value}")
+
+print("\nDescriptive statistics for general dating apps:")
+for stat, value in general_dating_apps_stats.items():
+    print(f"{stat}: {value}")
+
+print("\nDescriptive statistics for gay dating apps sentiment:")
+for stat, value in gay_apps_sentiment_stats.items():
+    print(f"{stat}: {value}")
+
+print("\nDescriptive statistics for general dating apps sentiment:")
+for stat, value in general_apps_sentiment_stats.items():
+    print(f"{stat}: {value}")
+
+
+# In[90]:
+
+
+class RatingAnalysis:
+    """
+    A class for performing statistical analysis on two datasets with a column chosen by the user.
+
+    Args:
+        data_file1 (str): The path to the first dataset CSV file.
+        data_file2 (str): The path to the second dataset CSV file.
+
+    Attributes:
+        data_df1 (pandas.DataFrame): The first dataset as a pandas DataFrame.
+        data_df2 (pandas.DataFrame): The second dataset as a pandas DataFrame.
+
+    Methods:
+        read_data(file_path): A static method that reads a CSV file and returns it as a pandas DataFrame.
+        two_sample_t_test(): Computes the t-test for the means of two independent samples.
+        two_sample_t_test_unequal_var(): Computes the t-test for the means of two independent samples with unequal variances.
+        cohen_d(): Computes Cohen's d effect size.
+        levene_test(): Computes Levene's test for equal variances.
+        perform_analysis(): Performs all the statistical analyses and returns a dictionary with the results.
+
+    Example usage:
+        # Read the merged CSV files and create dataframes
+        gay_dating_apps_df = pd.read_csv('gay_dating_apps_merged.csv')
+        general_dating_apps_df = pd.read_csv('general_dating_apps_merged.csv')
+
+        # Create an instance of the RatingAnalysis class for the two datasets
+        rating_analysis = RatingAnalysis('gay_dating_apps_merged.csv', 'general_dating_apps_merged.csv')
+
+        # Get the statistics for the rating analysis
+        rating_stats = rating_analysis.perform_analysis()
+
+        # Print the statistics
+        print("Statistics for Rating Analysis:")
+        for stat, value in rating_stats.items():
+            print(f"{stat}: {value}")
+    """
+    def __init__(self, data_file1, data_file2, column_name):
+        self.data_df1 = self.read_data(data_file1)
+        self.data_df2 = self.read_data(data_file2)
+        self.column_name = column_name
+
+    @staticmethod
+    def read_data(file_path):
+        return pd.read_csv(file_path)
+
+    def two_sample_t_test(self):
+        t_statistic, p_value = stats.ttest_ind(self.data_df1[self.column_name], self.data_df2[self.column_name])
+        return t_statistic, p_value
+
+    def two_sample_t_test_unequal_var(self):
+        levene_statistic, levene_p_value = self.levene_test()
+        if levene_p_value > 0.05:
+            return None
+        else:
+            print("The variances are not equal.")
+
+        t_statistic, p_value = stats.ttest_ind(self.data_df1[self.column_name], self.data_df2[self.column_name], equal_var=False)
+        return t_statistic, p_value
+
+    def cohen_d(self):
+        mean_diff = np.mean(self.data_df1[self.column_name]) - np.mean(self.data_df2[self.column_name])
+        n1, n2 = len(self.data_df1[self.column_name]), len(self.data_df2[self.column_name])
+        var1, var2 = np.var(self.data_df1[self.column_name], ddof=1), np.var(self.data_df2[self.column_name], ddof=1)
+
+        pooled_variance = ((n1 - 1) * var1 + (n2 - 1) * var2) / (n1 + n2 - 2)
+        d = mean_diff / np.sqrt(pooled_variance)
+
+        return d
+
+    def levene_test(self):
+        levene_statistic, levene_p_value = stats.levene(self.data_df1[self.column_name], self.data_df2[self.column_name])
+        if levene_p_value > 0.05:
+            return None
+        else:
+            return levene_statistic, levene_p_value
+    
+    def perform_analysis(self):
+        t_statistic, p_value = self.two_sample_t_test()
+        welch_statistic, welch_p_value = self.two_sample_t_test_unequal_var()
+        cohen_d_value = self.cohen_d()
+        levene_statistic, levene_p_value = self.levene_test()
+
+        results = {
+            'T-statistic': t_statistic,
+            'P-value': p_value,
+            'Welch T-statistic': welch_statistic,
+            'Welch P-value': welch_p_value,
+            'Cohen\'s d': cohen_d_value,
+            'Levene Statistic': levene_statistic,
+            'Levene P-value': levene_p_value
+        }
+
+        return results  
+rating_analysis = RatingAnalysis('gay_dating_apps_merged.csv', 'general_dating_apps_merged.csv', 'rating')
+sentiment_analysis = RatingAnalysis('gay_dating_apps_sentiment_merged.csv', 'general_dating_apps_sentiment_merged.csv', 'sentiment')
+
+rating_stats = rating_analysis.perform_analysis()
+sentiment_stats = sentiment_analysis.perform_analysis()
+
+# Print the statistics
+print("Statistics for Rating Analysis:")
+for stat, value in rating_stats.items():
+    print(f"{stat}: {value}")
+
+print("\nStatistics for Sentiment Analysis:")
+for stat, value in sentiment_stats.items():
+    print(f"{stat}: {value}")
 
